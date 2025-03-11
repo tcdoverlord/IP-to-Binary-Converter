@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP to Binary Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+        input[type="text"], button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .output, .section {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+            display: inline-block;
+        }
+        .section {
+            font-size: 16px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>IP to Binary Converter</h1>
+    <p>Enter an IP address below to see its binary representation:</p>
+    <input type="text" id="ipInput" placeholder="Enter IP Address">
+    <button onclick="convertToBinary()">Convert</button>
+    <div class="output" id="binaryOutput">
+        <p id="fullBinary"></p>
+        <button onclick="copyToClipboard('fullBinary')">Copy Full Binary</button>
+        <div id="binarySections"></div>
+    </div>
+
+    <script>
+        function convertToBinary() {
+            const ip = document.getElementById("ipInput").value;
+            const outputDiv = document.getElementById("binaryOutput");
+            const fullBinaryP = document.getElementById("fullBinary");
+            const sectionsDiv = document.getElementById("binarySections");
+
+            // Clear previous output
+            fullBinaryP.textContent = "";
+            sectionsDiv.innerHTML = "";
+
+            // Validate IP address format
+            const ipRegex = /^(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])(\.(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}$/;
+            if (!ipRegex.test(ip)) {
+                fullBinaryP.textContent = "Invalid IP address. Please try again.";
+                fullBinaryP.style.color = "red";
+                return;
+            }
+
+            // Convert IP to binary
+            const binaryOctets = ip.split('.').map(octet => {
+                return parseInt(octet).toString(2).padStart(8, '0');
+            });
+
+            const binaryRepresentation = binaryOctets.join('.');
+            fullBinaryP.textContent = binaryRepresentation;
+            fullBinaryP.style.color = "green";
+
+            // Break down into sections
+            binaryOctets.forEach((binary, index) => {
+                const section = document.createElement("div");
+                section.className = "section";
+                section.innerHTML = `
+                    <p>Section ${index + 1}: ${binary}</p>
+                    <button onclick="copyToClipboard('section${index}')">Copy Section ${index + 1}</button>
+                `;
+                section.id = `section${index}`;
+                sectionsDiv.appendChild(section);
+            });
+        }
+
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const textToCopy = element.textContent || element.innerText;
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => alert("Copied to clipboard!"))
+                .catch(err => alert("Failed to copy: " + err));
+        }
+    </script>
+</body>
+</html>
